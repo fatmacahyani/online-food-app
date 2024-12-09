@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 interface CartItem {
-  id: number;
-  menu_id: number;
+  cart_id: number;
   menu_name: string;
   quantity: number;
   price: number;
+  total: number;
 }
 
 const CartPage: React.FC = () => {
@@ -37,20 +37,20 @@ const CartPage: React.FC = () => {
     setTotal(totalAmount);
   };
 
-  const updateQuantity = (id: number, value: number) => {
+  const updateQuantity = (cart_id: number, value: number) => {
     if (value === 0) {
       axios
-        .delete(`${API_URL}/cart/${id}`)
+        .delete(`${API_URL}/cart/${cart_id}`)
         .then(() => {
           setUpdate(!update); 
-          console.log(`Item with id ${id} removed.`);
+          console.log(`Item with cart_id ${cart_id} removed.`);
         })
         .catch((error) => {
           console.error("Error removing item from cart:", error);
         });
     } else {
       axios
-        .put(`${API_URL}/cart/${id}`, { quantity: value })
+        .put(`${API_URL}/cart/${cart_id}`, { quantity: value })
         .then(() => {
           setUpdate(!update); 
         })
@@ -81,7 +81,7 @@ const CartPage: React.FC = () => {
               {cartItems
                 .filter((item) => item.quantity > 0) // Filter to show only items with quantity > 0
                 .map((item) => (
-                  <tr key={item.id}>
+                  <tr key={item.cart_id}>
                     <td className="border p-4">{item.menu_name}</td>
                     <td className="border p-4">{item.quantity}</td>
                     <td className="border p-4">Rp {item.price.toFixed(2)}</td>
@@ -92,7 +92,7 @@ const CartPage: React.FC = () => {
                       {item.quantity > 1 ? (
                         <button
                           onClick={() =>
-                            updateQuantity(item.id, item.quantity - 1)
+                            updateQuantity(item.cart_id, item.quantity - 1)
                           }
                           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mr-2"
                         >
@@ -101,7 +101,7 @@ const CartPage: React.FC = () => {
                       ) : null}
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
+                          updateQuantity(item.cart_id, item.quantity + 1)
                         }
                         className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                       >

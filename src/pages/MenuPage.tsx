@@ -71,7 +71,7 @@ const MenuPage: React.FC = () => {
               key={item.id}
               className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-300"
             >
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              <h2 className="text-xl font-bold text-gray-800 mb-2">
                 {item.item_name}
               </h2>
               <div className="gambar">
