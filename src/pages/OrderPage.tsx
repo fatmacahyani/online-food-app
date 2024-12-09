@@ -17,7 +17,7 @@ const OrderPage: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`${API_URL}/order/?user_id=${USER_ID}`)
+      .get(`${API_URL}/order/${USER_ID}`)
       .then((response) => {
         setOrders(response.data);
         setLoading(false);
