@@ -71,12 +71,13 @@ const MenuPage: React.FC = () => {
               key={item.id}
               className="bg-white shadow-md rounded-lg p-4 hover:shadow-lg transition-shadow duration-300"
             >
-              <h2 className="text-xl font-bold text-gray-800 mb-2">
-                {item.item_name}
-              </h2>
+
               <div className="gambar">
                 <img src={item.imagePath} alt="" />
               </div>
+              <h2 className="text-xl font-bold text-gray-800 mb-2">
+                {item.item_name}
+              </h2>
               <p className="text-gray-600 mb-4">{item.description}</p>
 
               <div className="flex items-center justify-between">
@@ -85,7 +86,7 @@ const MenuPage: React.FC = () => {
                 </p>
                 <PlusIcon
                   onClick={() => addItem(item.id)}
-                  className="flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full hover:bg-green-600 active:bg-green-700"
+                  className="flex items-center justify-center w-9 h-9 bg-green-500 text-white rounded-lg hover:bg-green-600 active:bg-green-700"
                 />
               </div>
             </div>
