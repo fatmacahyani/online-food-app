@@ -6,13 +6,14 @@ const MenuPage = lazy(() => import("@/pages/MenuPage"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const OrderPage = lazy(() => import("@/pages/OrderPage"));
 
-const Loading = () => (
+const Loading: React.FC = () => (
   <div className="flex justify-center items-center h-screen">
     <p className="text-xl font-semibold">Loading...</p>
   </div>
 );
 
-export const router = createBrowserRouter([
+
+const routes = [
   {
     path: "/",
     element: (
@@ -43,4 +44,6 @@ export const router = createBrowserRouter([
       </Layout>
     ),
   },
-]);
+];
+
+export const router = createBrowserRouter(routes);

@@ -52,13 +52,13 @@ const MenuPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-5xl font-bold text-center mb-6">Order Your Favourite Food!</h1>
+      <h1 className="text-4xl font-bold text-center mb-6">Order Your Favourite Food!</h1>
 
       <div className="flex justify-center mb-8">
       <img
         src="/imagepage.jpg"
         alt="Main Banner"
-        className="w-full h-auto max-w-screen-lg rounded-lg shadow-lg"
+        className="object-w-full h-auto max-w-screen-lg rounded-lg shadow-lg"
       />
     </div>
 

@@ -1,86 +1,72 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-interface MenuItem {
-  name: string;
-  price: number;
-  quantity: number;
-}
-
-interface Order {
-  id: number;
-  menuItems: MenuItem[];
-  totalPrice: number;
-  address: string;
-  paymentMethod: string;
+interface OrderItem {
+  order_id: number;
+  order_date: string;
+  status: string;
 }
 
 const OrderPage: React.FC = () => {
-  const [orderData, setOrderData] = useState<Order[]>([]);
-  const [address, setAddress] = useState<string>("");
-  const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [orders, setOrders] = useState<OrderItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const API_URL = import.meta.env.VITE_BACKEND_URL;
+  const USER_ID = import.meta.env.VITE_ID_USER;
 
   useEffect(() => {
+    setLoading(true);
     axios
-      .get("http://localhost:3001/order/")
+      .get(`${API_URL}/order/?user_id=${USER_ID}`)
       .then((response) => {
-        setOrderData(response.data);
-        if (response.data.length > 0) {
-          setAddress(response.data[0].address || "");
-          setPaymentMethod(response.data[0].paymentMethod || "");
-        }
+        setOrders(response.data);
+        setLoading(false);
       })
       .catch((error) => {
-        console.error("Error fetching order data:", error);
+        console.error("Error fetching orders:", error);
+        setLoading(false);
       });
   }, []);
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">Order Confirmation</h1>
-      <div className="mb-6">
-        <label className="block font-semibold mb-2">Delivery Address</label>
-        <input
-          type="text"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          className="w-full border border-gray-300 rounded p-2"
-        />
-      </div>
-
-      <div className="mb-6">
-        <h2 className="text-lg font-bold mb-2">Order Summary</h2>
-        {orderData?.map((order) => (
-          <div key={order.id} className="mb-4">
-            {order.menuItems.map((item, index) => (
-              <div key={index} className="flex justify-between mb-2">
-                <span>{item.name} (x{item.quantity})</span>
-                <span>Rp {item.price.toLocaleString()}</span>
-              </div>
+      <h1 className="text-2xl font-bold text-center mb-6">My Orders</h1>
+      {loading ? (
+        <p className="text-center text-gray-500">Loading orders...</p>
+      ) : orders.length === 0 ? (
+        <p className="text-center text-gray-500">You have no orders.</p>
+      ) : (
+        <table className="w-full border-collapse">
+          <thead>
+            <tr>
+              <th className="border p-4 text-left">Order ID</th>
+              <th className="border p-4 text-left">Order Date</th>
+              <th className="border p-4 text-left">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order.order_id}>
+                <td className="border p-4">{order.order_id}</td>
+                <td className="border p-4">{new Date(order.order_date).toLocaleDateString()}</td>
+                <td className="border p-4">
+                  <span
+                    className={`px-2 py-1 rounded ${
+                      order.status === "Delivered"
+                        ? "bg-green-500 text-white"
+                        : order.status === "Processing"
+                        ? "bg-yellow-500 text-white"
+                        : "bg-red-500 text-white"
+                    }`}
+                  >
+                    {order.status}
+                  </span>
+                </td>
+              </tr>
             ))}
-            <p className="font-bold mt-2">
-              Total: Rp {order.totalPrice.toLocaleString()}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      <div className="mb-6">
-        <label className="block font-semibold mb-2">Payment Method</label>
-        <select
-          value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
-          className="w-full border border-gray-300 rounded p-2"
-        >
-          <option value="Credit Card">Credit Card</option>
-          <option value="PayPal">PayPal</option>
-          <option value="Cash on Delivery">Cash on Delivery</option>
-        </select>
-      </div>
-
-      <button className="w-full bg-blue-500 text-white font-bold py-2 rounded hover:bg-blue-600">
-        Order
-      </button>
+          </tbody>
+        </table>
+      )}
     </div>
   );
 };
