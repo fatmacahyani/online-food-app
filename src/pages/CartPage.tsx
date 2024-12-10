@@ -43,15 +43,7 @@ const CartPage: React.FC = () => {
 
   const updateQuantity = (cart_id: number, value: number) => {
     if (value === 0) {
-      axios
-        .delete(`${API_URL}/cart/${cart_id}`)
-        .then(() => {
-          setUpdate(!update);
-          console.log(`Item with cart_id ${cart_id} removed.`);
-        })
-        .catch((error) => {
-          console.error("Error removing item from cart:", error);
-        });
+      deleteItem(cart_id);
     } else {
       axios
         .put(`${API_URL}/cart/${cart_id}`, { quantity: value })
@@ -63,6 +55,19 @@ const CartPage: React.FC = () => {
         });
     }
   };
+
+  const deleteItem = (cart_id: number) => {
+    axios
+      .delete(`${API_URL}/cart/${cart_id}`)
+      .then(() => {
+        setUpdate(!update);
+        console.log(`Item with cart_id ${cart_id} removed.`);
+      })
+      .catch((error) => {
+        console.error("Error removing item from cart:", error);
+      });
+  };
+
 
   const goToOrderConfirmation = () => {
     navigate("/orderconfirm");
@@ -95,24 +100,24 @@ const CartPage: React.FC = () => {
                     Rp {(item.price * item.quantity).toFixed(2)}
                   </td>
                   <td className="border p-4 text-center">
-                    {item.quantity > 1 ? (
-                      <button
-                        onClick={() =>
-                          updateQuantity(item.cart_id, item.quantity - 1)
-                        }
-                        className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mr-2"
-                      >
-                        -
-                      </button>
-                    ) : null}
                     <button
-                      onClick={() =>
-                        updateQuantity(item.cart_id, item.quantity + 1)
-                      }
+                      onClick={() => updateQuantity(item.cart_id, item.quantity - 1)}
+                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mr-2"
+                    >
+                      -
+                    </button>
+                    <button
+                      onClick={() => updateQuantity(item.cart_id, item.quantity + 1)}
                       className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                     >
                       +
                     </button>
+                    {/* <button
+                      onClick={() => deleteItem(item.cart_id)}
+                      className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2"
+                    >
+                      Remove
+                    </button> */}
                   </td>
                 </tr>
               ))}
@@ -128,7 +133,7 @@ const CartPage: React.FC = () => {
               onClick={goToOrderConfirmation}
               className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600"
             >
-              Proceed to Order Confirmation
+              Proceed to Order
             </button>
           </div>
         </div>

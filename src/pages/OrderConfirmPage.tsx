@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface OrderItem {
   menu_name: string;
@@ -16,6 +17,7 @@ const OrderConfirmPage: React.FC = () => {
 
   const API_URL = import.meta.env.VITE_BACKEND_URL;
   const USER_ID = import.meta.env.VITE_ID_USER;
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
@@ -29,8 +31,7 @@ const OrderConfirmPage: React.FC = () => {
         console.error("Error fetching order data:", error);
       });
 
-    // Simulate fetching the user's saved address
-    setAddress("123 Main Street, Jakarta");
+    setAddress(" ");
   }, []);
 
   const calculateTotal = (items: OrderItem[]) => {
@@ -50,10 +51,11 @@ const OrderConfirmPage: React.FC = () => {
     };
 
     axios
-      .post(`${API_URL}/order/submit`, orderData)
+      .post(`${API_URL}/order/`, orderData)
       .then(() => {
         console.log("Order placed successfully.");
         alert("Order placed successfully!");
+        navigate("/order"); // Navigate to the order page
       })
       .catch((error) => {
         console.error("Error placing order:", error);
@@ -118,7 +120,7 @@ const OrderConfirmPage: React.FC = () => {
               checked={paymentMethod === "card"}
               onChange={() => setPaymentMethod("card")}
             />
-            <span>Credit/Debit Card</span>
+            <span>Bank Transfer</span>
           </label>
         </div>
       </div>

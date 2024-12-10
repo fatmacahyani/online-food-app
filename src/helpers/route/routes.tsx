@@ -6,6 +6,9 @@ const MenuPage = lazy(() => import("@/pages/MenuPage"));
 const CartPage = lazy(() => import("@/pages/CartPage"));
 const OrderPage = lazy(() => import("@/pages/OrderPage"));
 const OrderConfirmPage = lazy(() => import("@/pages/OrderConfirmPage"));
+const AdminPage = lazy(() => import("@/pages/AdminPage"));
+const DetailPage = lazy(() => import("@/pages/DetailPage"));
+
 
 const Loading: React.FC = () => (
   <div className="flex justify-center items-center h-screen">
@@ -51,6 +54,26 @@ const routes = [
       <Layout>
         <Suspense fallback={<Loading />}>
           <OrderConfirmPage />
+        </Suspense>
+      </Layout>
+    ),
+  },
+  {
+    path: "/admin",
+    element: (
+      <Layout>
+        <Suspense fallback={<Loading />}>
+          <AdminPage />
+        </Suspense>
+      </Layout>
+    ),
+  },
+  {
+    path: "/detail/:id",
+    element: (
+      <Layout>
+        <Suspense fallback={<Loading />}>
+          <DetailPage />
         </Suspense>
       </Layout>
     ),
