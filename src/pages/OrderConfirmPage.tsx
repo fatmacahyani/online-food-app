@@ -55,7 +55,7 @@ const OrderConfirmPage: React.FC = () => {
       .then(() => {
         console.log("Order placed successfully.");
         alert("Order placed successfully!");
-        navigate("/order"); // Navigate to the order page
+        navigate("/order"); 
       })
       .catch((error) => {
         console.error("Error placing order:", error);
