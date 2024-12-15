@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { PlusIcon } from "@radix-ui/react-icons";
+//import { PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 
 interface MenuItem {
@@ -56,9 +56,9 @@ const MenuPage: React.FC = () => {
 
       <div className="flex justify-center mb-8">
       <img
-        src="/imagepage.jpg"
+        src="/imagepath1.jpg"
         alt="Main Banner"
-        className="object-w-full h-auto max-w-screen-lg rounded-lg shadow-lg"
+        className="w-full h-full object-cover rounded-lg"
       />
     </div>
 
@@ -84,10 +84,14 @@ const MenuPage: React.FC = () => {
                 <p className="text-lg font-bold text-green-600">
                   {formatCurrency(item.price)}
                 </p>
-                <PlusIcon
+              <div className="flex items-center justify-between">
+                <button
                   onClick={() => addItem(item.id)}
-                  className="flex items-center justify-center w-9 h-9 bg-green-500 text-white rounded-lg hover:bg-green-600 active:bg-green-700"
-                />
+                  className="min-w-32 w-full rounded-md bg-green-600 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-green-400 focus:shadow-none active:bg-green-400 hover:bg-green-400 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none-700"
+                  >
+                    Add to Cart
+                </button>
+                </div>
               </div>
             </div>
           ))}

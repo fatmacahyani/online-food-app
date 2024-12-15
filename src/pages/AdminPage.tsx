@@ -1,3 +1,4 @@
+// AdminPage.tsx
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -16,24 +17,11 @@ const AdminPage: React.FC = () => {
   const API_URL = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
 
-  const getStatusLabel = (status: number): { label: string; style: string } => {
-    switch (status) {
-      case 1:
-        return { label: "Processing", style: "bg-yellow-500 text-white" };
-      case 2:
-        return { label: "Delivered", style: "bg-green-500 text-white" };
-      case 3:
-        return { label: "Cancelled", style: "bg-red-500 text-white" };
-      default:
-        return { label: "Unknown", style: "bg-gray-500 text-white" };
-    }
-  };
 
   const handleStatusChange = (orderId: number, newStatus: number) => {
     axios
       .put(`${API_URL}/order/${orderId}/status`, { order_status: newStatus })
       .then((response) => {
-        console.log("API response:", response.data);
         if (response.data.success) {
           setOrders((prevOrders) =>
             prevOrders.map((order) =>
@@ -79,7 +67,7 @@ const AdminPage: React.FC = () => {
       ) : orders.length === 0 ? (
         <p className="text-center text-gray-500">No orders found.</p>
       ) : (
-        <table className="w-full text-center table-auto min-w-max">
+        <table className="w-full text-center border-collapse mb-6">
           <thead>
             <tr>
               <th className="border-b p-4 border-gray-200 bg-gray-100">Order ID</th>
@@ -91,13 +79,12 @@ const AdminPage: React.FC = () => {
           </thead>
           <tbody>
             {orders.map((order) => {
-              const { label, style } = getStatusLabel(order.status);
               return (
                 <tr key={order.order_id}>
                   <td className="border-b p-4">{order.order_id}</td>
                   <td className="border-b p-4">{order.user_id}</td>
                   <td className="border-b p-4">
-                    {new Date(order.order_date).toLocaleDateString()}
+                    {new Date(order.order_date).toLocaleString()}
                   </td>
                   <td className="border-b p-4">
                     <div className="flex justify-center">
@@ -106,16 +93,17 @@ const AdminPage: React.FC = () => {
                         onChange={(e) => handleStatusChange(order.order_id, parseInt(e.target.value))}
                         className="px-2 py-1 rounded border"
                       >
-                        <option value={1} className="bg-yellow-100">Processing</option>
-                        <option value={2} className="bg-green-100">Delivered</option>
-                        <option value={3} className="bg-red-100">Cancelled</option>
+                        <option value={1} className="bg-blue-100">Pending</option>
+                        <option value={2} className="bg-yellow-100">Processing</option>
+                        <option value={3} className="bg-green-100">Delivering</option>
+                        <option value={4} className="bg-red-100">Cancelled</option>
                       </select>
                     </div>
                   </td>
                   <td className="border-b p-4">
                     <button
                       onClick={() => goToDetailPage(order.order_id)}
-                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                     >
                       View Details
                     </button>

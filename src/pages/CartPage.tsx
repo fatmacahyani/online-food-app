@@ -14,6 +14,9 @@ const CartPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [update, setUpdate] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
+
 
   const API_URL = import.meta.env.VITE_BACKEND_URL;
   const USER_ID = import.meta.env.VITE_ID_USER;
@@ -24,14 +27,33 @@ const CartPage: React.FC = () => {
     axios
       .get(`${API_URL}/cart/${USER_ID}`)
       .then((response) => {
-        console.log("Cart items:", response.data.data);
-        setCartItems(response.data.data);
-        calculateTotal(response.data.data);
+        if (response.data.data) {
+          setCartItems(response.data.data);
+          calculateTotal(response.data.data);
+          setError(null); // Reset error state jika berhasil
+        } else {
+          setError("Lakukan login terlebih dahulu.");
+        }
       })
       .catch((error) => {
         console.error("Error fetching cart:", error);
+        if (error.response?.status === 404) {
+          setError("Lakukan login terlebih dahulu.");
+        } else {
+          setError("Terjadi kesalahan, coba lagi.");
+        }
       });
   }, [update]);
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    })
+      .format(price)
+      .replace("IDR", "Rp");
+  };
 
   const calculateTotal = (items: CartItem[]) => {
     const totalAmount = items.reduce(
@@ -42,6 +64,11 @@ const CartPage: React.FC = () => {
   };
 
   const updateQuantity = (cart_id: number, value: number) => {
+    if (!USER_ID) {
+      setError("Lakukan login terlebih dahulu.");
+      return;
+    }
+
     if (value === 0) {
       deleteItem(cart_id);
     } else {
@@ -49,9 +76,14 @@ const CartPage: React.FC = () => {
         .put(`${API_URL}/cart/${cart_id}`, { quantity: value })
         .then(() => {
           setUpdate(!update);
+          setError(null);
+          triggerNotification("Successfully updated!");
         })
         .catch((error) => {
           console.error("Error updating quantity:", error);
+          if (error.response?.status === 403) {
+            setError("Lakukan login terlebih dahulu.");
+          }
         });
     }
   };
@@ -68,6 +100,12 @@ const CartPage: React.FC = () => {
       });
   };
 
+  const triggerNotification = (message: string) => {
+    setNotification(message);
+    setTimeout(() => {
+      setNotification(null);
+    }, 1000); // Notification disappears after 3 seconds
+  };
 
   const goToOrderConfirmation = () => {
     navigate("/orderconfirm");
@@ -75,65 +113,92 @@ const CartPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-center mb-6">My Cart</h1>
+      <h1 className="text-3xl font-bold text-center mb-7">My Cart</h1>
+      {error && (
+        <div className="bg-red-100 text-red-700 px-4 py-3 rounded mb-4 text-center">
+          {error}
+        </div>
+      )}
+      {notification && (
+        <div className="bg-green-100 text-green-700 px-4 py-3 rounded mb-4 text-center">
+          {notification}
+        </div>
+      )}
       {cartItems.length === 0 ? (
         <p className="text-center text-gray-500">Your cart is empty.</p>
       ) : (
         <div>
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse mb-6">
             <thead>
               <tr>
-                <th className="border p-4 text-left">Item</th>
-                <th className="border p-4 text-left">Quantity</th>
-                <th className="border p-4 text-left">Price</th>
-                <th className="border p-4 text-left">Total</th>
-                <th className="border p-4">Actions</th>
+                <th className="border-b p-4 border-gray-200 bg-gray-100 text-center">Product</th>
+                <th className="border-b p-4 border-gray-200 bg-gray-100 text-center">Quantity</th>
+                <th className="border-b p-4 border-gray-200 bg-gray-100 text-center">Total</th>
               </tr>
             </thead>
             <tbody>
               {cartItems.map((item) => (
-                <tr key={item.cart_id}>
-                  <td className="border p-4">{item.menu_name}</td>
-                  <td className="border p-4">{item.quantity}</td>
-                  <td className="border p-4">Rp {item.price.toFixed(2)}</td>
-                  <td className="border p-4">
-                    Rp {(item.price * item.quantity).toFixed(2)}
+                <tr key={item.cart_id} className="bg-white border-b">
+                  <td className="border-b p-4">
+                    <div className="flex items-center space-x-4">
+                      {/* <img
+                        src={`/imagePath/${item.menu_name.toLowerCase().replace(/ /g, "-")}.jpg`}
+                        alt={item.menu_name}
+                        className="w-16 h-16 object-cover rounded"
+                      /> */}
+                      <div>
+                        <p className="font-bold">{item.menu_name}</p>
+                      </div>
+                    </div>
                   </td>
-                  <td className="border p-4 text-center">
-                    <button
-                      onClick={() => updateQuantity(item.cart_id, item.quantity - 1)}
-                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mr-2"
-                    >
-                      -
-                    </button>
-                    <button
-                      onClick={() => updateQuantity(item.cart_id, item.quantity + 1)}
-                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-                    >
-                      +
-                    </button>
-                    {/* <button
-                      onClick={() => deleteItem(item.cart_id)}
-                      className="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 ml-2"
-                    >
-                      Remove
-                    </button> */}
+                  <td className="border p-4">
+                    <div className="flex items-center justify-center">
+                      <button
+                        onClick={() => updateQuantity(item.cart_id, item.quantity - 1)}
+                        className={`px-4 py-2 rounded mr-2 ${
+                         item.quantity > 1
+                          ? "bg-green-500 text-white hover:bg-green-600"
+                          : "bg-gray-300 text-gray-500"
+                    }`}
+                  >
+                    -
+                  </button>
+                  <span className="mx-4">{item.quantity}</span>
+                  <button
+                    onClick={() => updateQuantity(item.cart_id, item.quantity + 1)}
+                    className="px-4 py-2 rounded bg-green-500 text-white hover:bg-green-600"
+                  >
+                    +
+                  </button>
+                  </div>
+                </td>
+                  <td className="border-b p-4 text-right">
+                    {formatPrice(item.price * item.quantity)}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-          <div className="text-right mt-6">
-            <p className="text-xl font-bold">
-              Total: <span className="text-green-600">Rp {total.toFixed(2)}</span>
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-lg font-bold">Sub Total:</p>
+            <p>{formatPrice(total)}</p>
+          </div>
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-lg font-bold">Delivery Charge:</p>
+            <p>{formatPrice(10000)}</p>
+          </div>
+          <div className="flex justify-between items-center mb-8">
+            <p className="text-xl font-bold">Total:</p>
+            <p className="text-xl font-bold text-black">
+              {formatPrice(total + 10000)}
             </p>
           </div>
-          <div className="text-center mt-6">
+          <div className="flex items-center justify-end">
             <button
               onClick={goToOrderConfirmation}
-              className="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600"
+              className="px-6 py-3 bg-green-500 text-white rounded hover:bg-green-600"
             >
-              Proceed to Order
+              Continue to Payment
             </button>
           </div>
         </div>
